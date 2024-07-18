@@ -3,12 +3,14 @@ from PyQt5.QtCore import Qt
 from PyQt6.QtWidgets import *
 import os, sys
 from functools import partial
+import fire
 
 
 class DMenu(QApplication):
 
-    def __init__(self, args, choices):
+    def __init__(self, args, choices, any):
         super().__init__(args)
+        self.any = any
         self.window = QWidget()
 
 
@@ -41,8 +43,11 @@ class DMenu(QApplication):
                 v.hide()
 
     def return_pressed(self):
-        if self.shown:
-            print(self.shown[0])
+        if self.any:
+            print(self.text.text())
+        else:
+            if self.shown:
+                print(self.shown[0])
         sys.exit(0 if self.shown else 1)
 
     def btn_pressed(self, b):
@@ -69,12 +74,12 @@ class DMenu(QApplication):
 
 
 
-def main():
+def main(any: bool=False):
     choices = sys.stdin.read().splitlines()
-    app = DMenu(sys.argv, choices)
+    app = DMenu(sys.argv, choices, any)
     app.exec()
 
 
 if __name__ == '__main__':
-    main()
+    fire.Fire(main)
 
