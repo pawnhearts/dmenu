@@ -8,9 +8,10 @@ import fire
 
 class DMenu(QApplication):
 
-    def __init__(self, args, choices, any):
+    def __init__(self, args, choices, any, path):
         super().__init__(args)
         self.any = any
+        self.path = path
         self.window = QWidget()
 
 
@@ -24,6 +25,8 @@ class DMenu(QApplication):
         self.text.returnPressed.connect(self.return_pressed)
         self.layout.addWidget(self.text)
         self.btns = {}
+        if self.path:
+            choices = os.listdir(self.path)
         for f in choices:
             self.btns[f] = QPushButton(f)
             self.layout.addWidget(self.btns[f])
@@ -42,12 +45,17 @@ class DMenu(QApplication):
             else:
                 v.hide()
 
+    def get_value(self, value):
+        if self.path:
+            return os.path.join(self.path, value)
+        return value
+
     def return_pressed(self):
         if self.any:
-            print(self.text.text())
+            print(self.get_value(self.text.text()))
         else:
             if self.shown:
-                print(self.shown[0])
+                print(self.get_value(self.shown[0]))
         sys.exit(0 if self.shown else 1)
 
     def btn_pressed(self, b):
@@ -61,8 +69,8 @@ class DMenu(QApplication):
         if k == 16777220:
             for k, v in self.btns.items():
                 if self.focusWidget() is v:
-                    print(k)
-            sys.exit(0)
+                    print(self.get_value(k))
+                    sys.exit(0)
 
         if k == 16777219:
             self.text.setText(self.text.text()[:-1])
@@ -74,9 +82,9 @@ class DMenu(QApplication):
 
 
 
-def main(any: bool=False):
+def main(path: str | None=None, any: bool=False):
     choices = sys.stdin.read().splitlines()
-    app = DMenu(sys.argv, choices, any)
+    app = DMenu(sys.argv, choices, any, path)
     app.exec()
 
 
