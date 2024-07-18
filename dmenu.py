@@ -59,10 +59,12 @@ class DMenu(QApplication):
                     print(k)
             sys.exit(0)
 
-        t = event.text()
-        if t:
-            self.text.setText(self.text.text()+t)
-            self.textChanged()
+        if k == 16777219:
+            self.text.setText(self.text.text()[:-1])
+        else:
+            if t := event.text():
+                self.text.setText(self.text.text()+t)
+                self.text_changed(self.text.text())
 
 
 
