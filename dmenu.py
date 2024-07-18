@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from PyQt5.QtCore import Qt
 from PyQt6.QtWidgets import *
 import os, sys
 from functools import partial
@@ -9,6 +10,10 @@ class DMenu(QApplication):
     def __init__(self, args, choices):
         super().__init__(args)
         self.window = QWidget()
+
+
+        self.window.move(0, 0)
+        self.window.resize(self.primaryScreen().size().width(), 20)
         self.layout = QHBoxLayout()
         self.text = QLineEdit()
         self.shown = []
@@ -47,13 +52,16 @@ class DMenu(QApplication):
     def key_pressed(self, event):
         k = event.key()
         if k == 16777216:
-            sys.exit(0)
+            sys.exit(1)
         if k == 16777220:
-            pass
+            for k, v in self.btns.items():
+                if self.focusWidget() is v:
+                    print(k)
+            sys.exit(0)
 
         t = event.text()
         if t:
-            self.text.setText(text.text()+t)
+            self.text.setText(self.text.text()+t)
             self.textChanged()
 
 
