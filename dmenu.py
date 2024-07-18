@@ -18,11 +18,11 @@ class DMenu(QApplication):
         self.window.move(0, 0)
         self.window.resize(self.primaryScreen().size().width(), 20)
         self.layout = QHBoxLayout()
-        self.text = QLineEdit()
+        self.text = QLabel('')
         self.shown = []
 
-        self.text.textEdited.connect(self.text_changed)
-        self.text.returnPressed.connect(self.return_pressed)
+        #self.text.textEdited.connect(self.text_changed)
+        #self.text.returnPressed.connect(self.return_pressed)
         self.layout.addWidget(self.text)
         self.btns = {}
         if self.path:
@@ -77,7 +77,7 @@ class DMenu(QApplication):
         else:
             if t := event.text():
                 self.text.setText(self.text.text()+t)
-                self.text_changed(self.text.text())
+        self.text_changed(self.text.text())
 
 
 
@@ -90,4 +90,3 @@ def main(path: str | None=None, any: bool=False):
 
 if __name__ == '__main__':
     fire.Fire(main)
-
