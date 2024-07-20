@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 from PyQt5.QtCore import Qt
-from PyQt6.QtWidgets import *
+from PyQt5.QtWidgets import *
 import os, sys
 from functools import partial
-import fire
+import click
 
 
 class DMenu(QApplication):
 
-    def __init__(self, args, choices, any, path):
+    def __init__(self, args, choices, any, ignore_case, starts_with, path):
         super().__init__(args)
         self.any = any
+        self.ignore_case = ignore_case
+        self.starts_with = starts_with
         self.path = path
         self.window = QWidget()
 
@@ -35,11 +37,12 @@ class DMenu(QApplication):
         self.window.setLayout(self.layout)
         self.window.show()
 
-
     def text_changed(self, t):
         self.shown = []
         for k, v in self.btns.items():
-            if t in k:
+            if self.ignore_case:
+                t, k = t.lower(), k.lower()
+            if k.startswith(t) if self.starts_with else (t in k):
                 self.shown.append(k)
                 v.show()
             else:
@@ -82,11 +85,16 @@ class DMenu(QApplication):
 
 
 
-def main(path: str | None=None, any: bool=False):
+@click.command()
+@click.option('--any', is_flag=True, default=False, help='Allows to type anything, not just select from list')
+@click.option('-i', is_flag=True, default=False, help='Ignore case when searching')
+@click.option('-s', is_flag=True, default=False, help='Should start with string you typed not just contain it')
+@click.option('--path', default=None, type=click.Path(exists=True))
+def main(any, i, s, path):
     choices = sys.stdin.read().splitlines()
-    app = DMenu(sys.argv, choices, any, path)
+    app = DMenu(sys.argv, choices, any, i, s, path)
     app.exec()
 
 
 if __name__ == '__main__':
-    fire.Fire(main)
+    main()
