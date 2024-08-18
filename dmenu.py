@@ -8,7 +8,7 @@ import click
 
 class DMenu(QApplication):
 
-    def __init__(self, args, choices, any, ignore_case, starts_with, path):
+    def __init__(self, args, choices, any, ignore_case, starts_with, vertical, path):
         super().__init__(args)
         self.any = any
         self.ignore_case = ignore_case
@@ -19,7 +19,7 @@ class DMenu(QApplication):
 
         self.window.move(0, 0)
         self.window.resize(self.primaryScreen().size().width(), 20)
-        self.layout = QHBoxLayout()
+        self.layout = QVBoxLayout() if vertical else QHBoxLayout()
         self.text = QLabel('')
         self.shown = []
 
@@ -89,10 +89,11 @@ class DMenu(QApplication):
 @click.option('--any', is_flag=True, default=False, help='Allows to type anything, not just select from list')
 @click.option('-i', is_flag=True, default=False, help='Ignore case when searching')
 @click.option('-s', is_flag=True, default=False, help='Should start with string you typed not just contain it')
+@click.option('-v', is_flag=True, default=False, help='Vertical')
 @click.option('--path', default=None, type=click.Path(exists=True))
-def main(any, i, s, path):
+def main(any, i, s, v, path):
     choices = sys.stdin.read().splitlines()
-    app = DMenu(sys.argv, choices, any, i, s, path)
+    app = DMenu(sys.argv, choices, any, i, s, v, path)
     app.exec()
 
 
