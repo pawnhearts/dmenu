@@ -6,14 +6,16 @@ from functools import partial
 import click
 
 
+
 class DMenu(QApplication):
 
-    def __init__(self, args, choices, any, ignore_case, starts_with, vertical, path):
+    def __init__(self, args, choices, any, ignore_case, starts_with, vertical, path, max_buttons):
         super().__init__(args)
         self.any = any
         self.ignore_case = ignore_case
         self.starts_with = starts_with
         self.path = path
+        self.max_buttons = max_buttons
         self.window = QWidget()
 
 
@@ -32,7 +34,10 @@ class DMenu(QApplication):
         for f in choices:
             self.btns[f] = QPushButton(f)
             self.layout.addWidget(self.btns[f])
+            if len(self.btns) > self.max_buttons:
+                self.btns[f].hide()
             self.btns[f].clicked.connect(partial(self.btn_pressed, f))
+
         self.window.keyPressEvent = self.key_pressed
         self.window.setLayout(self.layout)
         self.window.show()
@@ -42,7 +47,7 @@ class DMenu(QApplication):
         for k, v in self.btns.items():
             if self.ignore_case:
                 t, k = t.lower(), k.lower()
-            if k.startswith(t) if self.starts_with else (t in k):
+            if len(self.shown) <= self.max_buttons and (k.startswith(t) if self.starts_with else (t in k)):
                 self.shown.append(k)
                 v.show()
             else:
@@ -91,11 +96,13 @@ class DMenu(QApplication):
 @click.option('-s', is_flag=True, default=False, help='Should start with string you typed not just contain it')
 @click.option('-v', is_flag=True, default=False, help='Vertical')
 @click.option('--path', default=None, type=click.Path(exists=True))
-def main(any, i, s, v, path):
-    choices = sys.stdin.read().splitlines()
-    app = DMenu(sys.argv, choices, any, i, s, v, path)
+@click.option('--max-buttons', default=20, type=int, help='Max number of buttons to show at the same time')
+def main(any, i, s, v, path, max_buttons):
+    choices = sys.stdin.read().splitlines() if not path else None
+    app = DMenu(sys.argv, choices, any, i, s, v, path, max_buttons)
     app.exec()
 
 
 if __name__ == '__main__':
     main()
+
