@@ -40,6 +40,7 @@ class DMenu(QApplication):
 
         self.window.keyPressEvent = self.key_pressed
         self.window.setLayout(self.layout)
+        self.window.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
         self.window.show()
 
     def text_changed(self, t):
